@@ -59,7 +59,7 @@ ga('send', 'pageview');
 <div class="intrude-less">
 	<header id="header" class="inner">
 		<a href="/" class="profilepic">
-			<img src="http://avatar.csdn.net/4/8/2/1_ldjackson.jpg" class="js-avatar">
+			<img src="/img/misc/aventa_high.jpg" class="js-avatar">
 		</a>
 		<hgroup>
 		  <h1 class="header-author"><a href="/">Jacob</a></h1>
@@ -117,7 +117,7 @@ ga('send', 'pageview');
 	<div class="intrude-less">
 		<header id="header" class="inner">
 			<div class="profilepic">
-				<img src="http://avatar.csdn.net/4/8/2/1_ldjackson.jpg" class="js-avatar">
+				<img src="/img/misc/aventa_high.jpg" class="js-avatar">
 			</div>
 			<hgroup>
 			  <h1 class="header-author js-header-author">Jacob</h1>
@@ -169,6 +169,82 @@ ga('send', 'pageview');
           </div>
           <div id="js-content" class="content-ll">
             
+  
+    <article id="post-i-am-back" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/21/i-am-back/">我回来啦</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/21/i-am-back/" class="archive-article-date">
+  	<time datetime="2018-03-20T16:44:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-21</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>半年没更新了。期间写了一些草稿，但也疏于整理了。</p>
+</blockquote>
+<p>自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。</p>
+<h4 id="通过yilla主题配置Disqus"><a href="#通过yilla主题配置Disqus" class="headerlink" title="通过yilla主题配置Disqus"></a>通过yilla主题配置Disqus</h4><p>更新了最新的<a href="https://github.com/litten/hexo-theme-yilia" target="_blank" rel="noopener">yilla</a>版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus，万一国内的提供商又挂了呢。</p>
+<p>在Disqus上操作流程倒简单，新建了website之后，在profile中找到’short name’，配置到yilla的config文件即可。如：</p>
+<pre><code>#4、Disqus 在hexo根目录的config里也有disqus_shortname字段，优先使用yilia的
+disqus: your_website_short_name
+</code></pre><h4 id="yilla主题更多功能"><a href="#yilla主题更多功能" class="headerlink" title="yilla主题更多功能"></a>yilla主题更多功能</h4><p>yilla主题新支持了打赏功能，虽然基本不可能有人真的肯花真金白银，还是做上。（我之前调研过：在简书这样的平台通过写文章打赏营收的方式是否可行，结果是打赏的次数微乎其微）</p>
+<p>截取了支付宝和微信的二维码，放置到<code>/img</code>目录下，把yilla的config中配置上即可。如：</p>
+<pre><code>alipay: /img/alipay_qr_code.png
+weixin: /img/weixin_pay_qr_code.png
+</code></pre><h4 id="I’m-back"><a href="#I’m-back" class="headerlink" title="I’m back"></a>I’m back</h4><p>这次更新主题后，整体页面更美观，字体和谐。感谢yilla作者。</p>
+<p>之后会根据在工作中各种收获，及之前累计的草稿，逐步发出来，供更多人参阅，也为技术分享做点贡献。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/21/i-am-back/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
   
     <article id="post-netty-recycler-cache" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
@@ -1052,92 +1128,6 @@ audioElement.play();
 
 
   
-    <article id="post-one-small-code-bug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/10/28/one-small-code-bug/">java:一个try-cache的隐晦bug</a>
-    </h1>
-  
-
-        
-        <a href="/2016/10/28/one-small-code-bug/" class="archive-article-date">
-  	<time datetime="2016-10-28T10:02:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-10-28</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="一个bug"><a href="#一个bug" class="headerlink" title="一个bug"></a>一个bug</h2><p>各位请先看一段获取客户端链接的代码：</p>
-<pre><code>Client client = getClient();
-
-   private Client getClient() throws Exception {
-  try {
-    if (client == null || !client.ping()) {
-        client = reConnect();
-    }
-  } catch (Exception e) {
-    logger.error(&quot;reConnect exception&quot;, e);
-  }
-  return client;
-}
-</code></pre><p>代码初衷是<code>getClient()</code>失败时尝试<code>reConnect()</code>，可问题是程序的定时任务调用<code>getClient()</code>总是重连失败，报错<code>reConnect exception</code>，导致业务逻辑总是无法正常运作。</p>
-<h2 id="原因解析"><a href="#原因解析" class="headerlink" title="原因解析"></a>原因解析</h2><p>我review代码好久，都没想明白原因，只好debug调试。</p>
-<p>debug到<code>if (client == null || !client.ping())</code>时，就直接跳到<code>catch</code>语句。原来，真相是<code>client.ping()</code>就直接报异常跳出了，那么就永远走不到<code>reConnect()</code>了。自然永远都无法拿到可用的<code>client</code>。</p>
-<h2 id="启示"><a href="#启示" class="headerlink" title="启示"></a>启示</h2><ol>
-<li><p>这段简单的代码却花了不少时间排查。也主要是潜意识认为，像<code>ping()</code>这种行为即使异常出错那么就应该返回<code>false</code>。没想到它内部代码的处理这么简单直接。</p>
-</li>
-<li><p>第三方代码深不可测。使用第三方代码需谨慎，并做好各种防御性。</p>
-</li>
-<li><p>仅仅review难以看出问题，还需实战。</p>
-</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/10/28/one-small-code-bug/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1260,19 +1250,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">story</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">思考</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">dota2</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">math</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">story</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">思考</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1292,10 +1282,6 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">neo4j</a>
               </li>
              
@@ -1304,15 +1290,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">hexo</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">ecs</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Integer</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">Overflow</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">ecs</a>
               </li>
              
               <li class="article-tag-list-item">
