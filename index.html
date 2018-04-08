@@ -191,7 +191,7 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <blockquote>
-<p>最近在做一个基于Elasticsearch的项目，发现<code>spring-data-elasticsearch</code>组件提供的CRUD功能特别好用。但是使用中发现分页的功能，即<code>spring-data</code>提供的<code>Pagalbe</code>, <code>Slice</code>功能实际不能正确分页的bug。且该Bug影响了目前spring-data-elasticsearch的3.0~3.0.3版本，至今未修复。</p>
+<p>最近在做一个基于Elasticsearch的项目，发现<code>spring-data-elasticsearch</code>组件提供的CRUD功能特别好用。但是使用中发现分页的功能，即<code>spring-data</code>提供的<code>Pagalbe</code>, <code>Slice</code>功能实际不能正确分页的bug。且该Bug影响了目前spring-data-elasticsearch的3.0~3.1.0 M1版本，至今未修复。</p>
 </blockquote>
 <h4 id="好用的spring-data-elasticsearch与分页功能"><a href="#好用的spring-data-elasticsearch与分页功能" class="headerlink" title="好用的spring-data-elasticsearch与分页功能"></a>好用的<code>spring-data-elasticsearch</code>与分页功能</h4><p><code>spring-data-elasticsearch</code>提供了各种基于<code>CrudRepository</code>的便利<strong>CRUD</strong>操作后，可以自动将基本的查询检索操作翻译成Elasticsearch的<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html" target="_blank" rel="noopener">Query DSL</a>。只要按照简单易学的<code>spring-data</code>的schema编写Repository的接口名，就可像使用Mybatis一样使用elasticsearch。</p>
 <p>特别的，只要在interface中带上<code>Pageable</code>的输入参数，就能<strong>自动实现分页</strong>的效果(<a href="https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#repositories.special-parameters" target="_blank" rel="noopener">spring doc</a>)。例如：</p>
@@ -208,7 +208,7 @@ Slice&lt;Article&gt; articleByAuthorNameAsSlice
     }
 </code></pre><h4 id="惨遇分页bug"><a href="#惨遇分页bug" class="headerlink" title="惨遇分页bug"></a>惨遇分页bug</h4><p>但是！这么方便的功能，在目前版本中是不能正常运作的！</p>
 <p>现在是2018年4月，在<a href="https://projects.spring.io/spring-data-elasticsearch/" target="_blank" rel="noopener">Spring project</a>主页上的版本从<strong>3.0.6</strong>到<strong>3.1.0 M1</strong>都有这个Bug的！</p>
-<p>在spring的jira上<a href="https://jira.spring.io/browse/DATAES-396" target="_blank" rel="noopener">DATAES-396</a>，<a href="https://jira.spring.io/browse/DATAES-402" target="_blank" rel="noopener">DATAES-402</a>就是反映这个这个<strong>Blocker</strong>级别的bug。从2017年9月份发布3.0依赖就有这个bug了，相关热心开发者也提供了<a href="https://github.com/spring-projects/spring-data-elasticsearch/pull/198/files" target="_blank" rel="noopener">PR</a>，但是直到最近（约2018年3月）才被merge进master分支！</p>
+<p>在spring的jira上<a href="https://jira.spring.io/browse/DATAES-396" target="_blank" rel="noopener">DATAES-396</a>，<a href="https://jira.spring.io/browse/DATAES-402" target="_blank" rel="noopener">DATAES-402</a>就是反映这个这个<strong>Blocker</strong>级别的bug。从2017年9月份发布3.0支持Elasticsearch 5后就有这个bug了，相关热心开发者也提供了<a href="https://github.com/spring-projects/spring-data-elasticsearch/pull/198/files" target="_blank" rel="noopener">PR</a>，但是直到最近（约2018年3月）才被merge进master分支！</p>
 <p>其实导致这个错误的代码就一行，在<code>FacetedPageImpl</code>的构造函数中，将Pageable写死成了<code>Pageable.unpaged()</code>:</p>
 <pre><code>public FacetedPageImpl(List&lt;T&gt; content, Pageable pageable, long total) {
     super(content, Pageable.unpaged(), total);
@@ -217,7 +217,7 @@ Slice&lt;Article&gt; articleByAuthorNameAsSlice
 <pre><code>public FacetedPageImpl(List&lt;T&gt; content, Pageable pageable, long total) {
         super(content, ofNullable(pageable).orElse(Pageable.unpaged()), total);
     }
-</code></pre><h4 id="为什么响应这么慢？"><a href="#为什么响应这么慢？" class="headerlink" title="为什么响应这么慢？"></a>为什么响应这么慢？</h4><p>在搜索这个问题过程中，有人在stackoverflow上反应，不仅这种重要的bug未能及时修复，还抱怨<code>spring-data-elasticsearch</code>未能更上elstic的开发脚步（spring data es目前支持到了Elasticsearch 5, 而elstico现在已推出了6.3版本，提供了rollup，shrink等api)。</p>
+</code></pre><h4 id="为什么响应这么慢？"><a href="#为什么响应这么慢？" class="headerlink" title="为什么响应这么慢？"></a>为什么响应这么慢？</h4><p>在搜索这个问题过程中，有人在stackoverflow上反映，不仅这种紧急的bug未能及时修复，还抱怨<code>spring-data-elasticsearch</code>未能跟上elstic的开发脚步（spring data es目前支持到了Elasticsearch 5, 而elstico现在已推出了6.3版本，提供了rollup，shrink等api)。</p>
 <p>下面有人附和到，他去参加了spring的一个相关会议，spring的总架构师，把<code>spring-data-elasticsearch</code>划分到了<em>community project</em>。也就是说，剩下的维护大多靠社区的PR，官方不会那么及时的跟进elastic的步伐。一句话总结就是：没娘的项目惨兮兮。</p>
 <p>（那个讨论贴，忘了记录下来，现在找不到了地址了）</p>
 <p>经历了这次事件后，再也不迷信<code>Spring</code>的项目就是高质量的项目。对于开源软件框架等，存一份质疑之心。知其然，也要知其所以然。</p>
@@ -285,7 +285,7 @@ Slice&lt;Article&gt; articleByAuthorNameAsSlice
     <div class="article-entry" itemprop="articleBody">
       
         <p><a href="https://momentjs.com/" target="_blank" rel="noopener">momentjs</a>是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。</p>
-<p>由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：<code>import moment = require(&quot;moment”);</code><br>或<code>import * as moment from &#39;moment’;</code>初期项目编译正常，运行正常。</p>
+<p>由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：<code>import moment = require(&quot;moment”);</code>或<code>import * as moment from &#39;moment’;</code>初期项目编译正常，运行正常。</p>
 <p>而后我为了提高代码质量，引入了<a href="https://facebook.github.io/jest/" target="_blank" rel="noopener">Jest</a>做自动化测试，然后就跪了。</p>
 <p>项目中一般是用<code>import * as moment from &#39;moment’</code>，那么Jest会报：</p>
 <pre><code>moment is not a function

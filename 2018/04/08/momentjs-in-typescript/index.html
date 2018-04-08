@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Jacobs Blog">
 <meta property="og:description" content="momentjs是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。 由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：import moment = require(&amp;quot;moment”);或import * as moment from &amp;#39;moment’;初期项目编译正常，运行正常。 而后我为了提高代码质量，引入了Jes">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-08T15:46:04.142Z">
+<meta property="og:updated_time" content="2018-04-08T15:55:47.515Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="修复momentjs在Typescript项目中与Jest不能同时工作的问题">
 <meta name="twitter:description" content="momentjs是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。 由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：import moment = require(&amp;quot;moment”);或import * as moment from &amp;#39;moment’;初期项目编译正常，运行正常。 而后我为了提高代码质量，引入了Jes">
@@ -190,7 +190,7 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <p><a href="https://momentjs.com/" target="_blank" rel="noopener">momentjs</a>是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。</p>
-<p>由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：<code>import moment = require(&quot;moment”);</code><br>或<code>import * as moment from &#39;moment’;</code>初期项目编译正常，运行正常。</p>
+<p>由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：<code>import moment = require(&quot;moment”);</code>或<code>import * as moment from &#39;moment’;</code>初期项目编译正常，运行正常。</p>
 <p>而后我为了提高代码质量，引入了<a href="https://facebook.github.io/jest/" target="_blank" rel="noopener">Jest</a>做自动化测试，然后就跪了。</p>
 <p>项目中一般是用<code>import * as moment from &#39;moment’</code>，那么Jest会报：</p>
 <pre><code>moment is not a function
