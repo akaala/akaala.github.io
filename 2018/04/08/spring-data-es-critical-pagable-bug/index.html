@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://jacob.github.io">
-  <title>我回来啦 | Jacobs Blog</title>
+  <title>Spring Data Elasticsearch Page Slice 分页功能不能正确分页的bug | Jacobs Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="半年没更新了。期间写了一些草稿，但也疏于整理了。  自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。 通过yilla主题配置Disqus更新了最新的yilla版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus">
+  <meta name="description" content="最近在做一个基于Elasticsearch的项目，发现spring-data-elasticsearch组件提供的CRUD功能特别好用。但是使用中发现分页的功能，即spring-data提供的Pagalbe, Slice功能实际不能正确分页的bug。且该Bug影响了目前spring-data-elasticsearch的3.0~3.0.3版本，至今未修复。  好用的spring-data-ela">
 <meta property="og:type" content="article">
-<meta property="og:title" content="我回来啦">
-<meta property="og:url" content="http://jacob.github.io/2018/03/21/i-am-back/index.html">
+<meta property="og:title" content="Spring Data Elasticsearch Page Slice 分页功能不能正确分页的bug">
+<meta property="og:url" content="http://jacob.github.io/2018/04/08/spring-data-es-critical-pagable-bug/index.html">
 <meta property="og:site_name" content="Jacobs Blog">
-<meta property="og:description" content="半年没更新了。期间写了一些草稿，但也疏于整理了。  自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。 通过yilla主题配置Disqus更新了最新的yilla版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus">
+<meta property="og:description" content="最近在做一个基于Elasticsearch的项目，发现spring-data-elasticsearch组件提供的CRUD功能特别好用。但是使用中发现分页的功能，即spring-data提供的Pagalbe, Slice功能实际不能正确分页的bug。且该Bug影响了目前spring-data-elasticsearch的3.0~3.0.3版本，至今未修复。  好用的spring-data-ela">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-20T17:01:13.964Z">
+<meta property="og:updated_time" content="2018-04-08T15:46:04.142Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="我回来啦">
-<meta name="twitter:description" content="半年没更新了。期间写了一些草稿，但也疏于整理了。  自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。 通过yilla主题配置Disqus更新了最新的yilla版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus">
+<meta name="twitter:title" content="Spring Data Elasticsearch Page Slice 分页功能不能正确分页的bug">
+<meta name="twitter:description" content="最近在做一个基于Elasticsearch的项目，发现spring-data-elasticsearch组件提供的CRUD功能特别好用。但是使用中发现分页的功能，即spring-data提供的Pagalbe, Slice功能实际不能正确分页的bug。且该Bug影响了目前spring-data-elasticsearch的3.0~3.0.3版本，至今未修复。  好用的spring-data-ela">
   
     <link rel="alternative" href="/atom.xml" title="Jacobs Blog" type="application/atom+xml">
   
@@ -169,20 +169,20 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-i-am-back" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-spring-data-es-critical-pagable-bug" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      我回来啦
+      Spring Data Elasticsearch Page Slice 分页功能不能正确分页的bug
     </h1>
   
 
         
-        <a href="/2018/03/21/i-am-back/" class="archive-article-date">
-  	<time datetime="2018-03-20T16:44:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-21</time>
+        <a href="/2018/04/08/spring-data-es-critical-pagable-bug/" class="archive-article-date">
+  	<time datetime="2018-04-08T14:39:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-08</time>
 </a>
         
       </header>
@@ -190,19 +190,37 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <blockquote>
-<p>半年没更新了。期间写了一些草稿，但也疏于整理了。</p>
+<p>最近在做一个基于Elasticsearch的项目，发现<code>spring-data-elasticsearch</code>组件提供的CRUD功能特别好用。但是使用中发现分页的功能，即<code>spring-data</code>提供的<code>Pagalbe</code>, <code>Slice</code>功能实际不能正确分页的bug。且该Bug影响了目前spring-data-elasticsearch的3.0~3.0.3版本，至今未修复。</p>
 </blockquote>
-<p>自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。</p>
-<h4 id="通过yilla主题配置Disqus"><a href="#通过yilla主题配置Disqus" class="headerlink" title="通过yilla主题配置Disqus"></a>通过yilla主题配置Disqus</h4><p>更新了最新的<a href="https://github.com/litten/hexo-theme-yilia" target="_blank" rel="noopener">yilla</a>版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus，万一国内的提供商又挂了呢。</p>
-<p>在Disqus上操作流程倒简单，新建了website之后，在profile中找到’short name’，配置到yilla的config文件即可。如：</p>
-<pre><code>#4、Disqus 在hexo根目录的config里也有disqus_shortname字段，优先使用yilia的
-disqus: your_website_short_name
-</code></pre><h4 id="yilla主题更多功能"><a href="#yilla主题更多功能" class="headerlink" title="yilla主题更多功能"></a>yilla主题更多功能</h4><p>yilla主题新支持了打赏功能，虽然基本不可能有人真的肯花真金白银，还是做上。（我之前调研过：在简书这样的平台通过写文章打赏营收的方式是否可行，结果是打赏的次数微乎其微）</p>
-<p>截取了支付宝和微信的二维码，放置到<code>/img</code>目录下，把yilla的config中配置上即可。如：</p>
-<pre><code>alipay: /img/alipay_qr_code.png
-weixin: /img/weixin_pay_qr_code.png
-</code></pre><h4 id="I’m-back"><a href="#I’m-back" class="headerlink" title="I’m back"></a>I’m back</h4><p>这次更新主题后，整体页面更美观，字体和谐。感谢yilla作者。</p>
-<p>之后会根据在工作中各种收获，及之前累计的草稿，逐步发出来，供更多人参阅，也为技术分享做点贡献。</p>
+<h4 id="好用的spring-data-elasticsearch与分页功能"><a href="#好用的spring-data-elasticsearch与分页功能" class="headerlink" title="好用的spring-data-elasticsearch与分页功能"></a>好用的<code>spring-data-elasticsearch</code>与分页功能</h4><p><code>spring-data-elasticsearch</code>提供了各种基于<code>CrudRepository</code>的便利<strong>CRUD</strong>操作后，可以自动将基本的查询检索操作翻译成Elasticsearch的<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html" target="_blank" rel="noopener">Query DSL</a>。只要按照简单易学的<code>spring-data</code>的schema编写Repository的接口名，就可像使用Mybatis一样使用elasticsearch。</p>
+<p>特别的，只要在interface中带上<code>Pageable</code>的输入参数，就能<strong>自动实现分页</strong>的效果(<a href="https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#repositories.special-parameters" target="_blank" rel="noopener">spring doc</a>)。例如：</p>
+<pre><code>Page&lt;Article&gt; articleByAuthorName
+  = articleService.findByAuthorName(nameToFind, PageRequest.of(0, 10));
+
+Slice&lt;Article&gt; articleByAuthorNameAsSlice
+  = articleService.findByAuthorNameAsSlice(nameToFind, PageRequest.of(0, 10));
+</code></pre><p>其中返回参数<code>Page</code>和<code>Slice</code>的区别是：<code>Page</code>对象会计算结果集的totalCount，在数据量大时会有一定的计算代价；而<code>Slice</code>不会计算总结果数量，只知道是否<code>hasNext()</code>。</p>
+<p>类似的，用<code>Slice</code>做大结果集的遍历，也非常简单。可用自带的<code>nextPagable</code>计算下一页的偏移量。</p>
+<pre><code>while (slice.hasNext()) {
+        slice = eventRepository.findByAppId(appId, slice.nextPageable());
+        result.addAll(slice.getContent());
+    }
+</code></pre><h4 id="惨遇分页bug"><a href="#惨遇分页bug" class="headerlink" title="惨遇分页bug"></a>惨遇分页bug</h4><p>但是！这么方便的功能，在目前版本中是不能正常运作的！</p>
+<p>现在是2018年4月，在<a href="https://projects.spring.io/spring-data-elasticsearch/" target="_blank" rel="noopener">Spring project</a>主页上的版本从<strong>3.0.6</strong>到<strong>3.1.0 M1</strong>都有这个Bug的！</p>
+<p>在spring的jira上<a href="https://jira.spring.io/browse/DATAES-396" target="_blank" rel="noopener">DATAES-396</a>，<a href="https://jira.spring.io/browse/DATAES-402" target="_blank" rel="noopener">DATAES-402</a>就是反映这个这个<strong>Blocker</strong>级别的bug。从2017年9月份发布3.0依赖就有这个bug了，相关热心开发者也提供了<a href="https://github.com/spring-projects/spring-data-elasticsearch/pull/198/files" target="_blank" rel="noopener">PR</a>，但是直到最近（约2018年3月）才被merge进master分支！</p>
+<p>其实导致这个错误的代码就一行，在<code>FacetedPageImpl</code>的构造函数中，将Pageable写死成了<code>Pageable.unpaged()</code>:</p>
+<pre><code>public FacetedPageImpl(List&lt;T&gt; content, Pageable pageable, long total) {
+    super(content, Pageable.unpaged(), total);
+ }
+</code></pre><p>改起来也很简单：</p>
+<pre><code>public FacetedPageImpl(List&lt;T&gt; content, Pageable pageable, long total) {
+        super(content, ofNullable(pageable).orElse(Pageable.unpaged()), total);
+    }
+</code></pre><h4 id="为什么响应这么慢？"><a href="#为什么响应这么慢？" class="headerlink" title="为什么响应这么慢？"></a>为什么响应这么慢？</h4><p>在搜索这个问题过程中，有人在stackoverflow上反应，不仅这种重要的bug未能及时修复，还抱怨<code>spring-data-elasticsearch</code>未能更上elstic的开发脚步（spring data es目前支持到了Elasticsearch 5, 而elstico现在已推出了6.3版本，提供了rollup，shrink等api)。</p>
+<p>下面有人附和到，他去参加了spring的一个相关会议，spring的总架构师，把<code>spring-data-elasticsearch</code>划分到了<em>community project</em>。也就是说，剩下的维护大多靠社区的PR，官方不会那么及时的跟进elastic的步伐。一句话总结就是：没娘的项目惨兮兮。</p>
+<p>（那个讨论贴，忘了记录下来，现在找不到了地址了）</p>
+<p>经历了这次事件后，再也不迷信<code>Spring</code>的项目就是高质量的项目。对于开源软件框架等，存一份质疑之心。知其然，也要知其所以然。</p>
+<p>最后，期望<code>spring-data-elasticsearch</code>尽快发布3.1 release版本。查看<a href="https://spring-calendar.cfapps.io/" target="_blank" rel="noopener">Spring calendar</a>，好像近期都没有计划。 ::cry::</p>
 
       
 
@@ -292,7 +310,7 @@ weixin: /img/weixin_pay_qr_code.png
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://jacob.github.io/2018/03/21/i-am-back/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://jacob.github.io/2018/04/08/spring-data-es-critical-pagable-bug/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -306,18 +324,9 @@ weixin: /img/weixin_pay_qr_code.png
   
 <nav id="article-nav">
   
-    <a href="/2018/04/08/momentjs-in-typescript/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          修复momentjs在Typescript项目中与Jest不能同时工作的问题
-        
-      </div>
-    </a>
   
-  
-    <a href="/2017/09/13/netty-recycler-cache/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">禁用Netty对象缓存机制</div>
+    <a href="/2018/04/08/momentjs-in-typescript/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">修复momentjs在Typescript项目中与Jest不能同时工作的问题</div>
       <i class="icon-circle-right"></i>
     </a>
   

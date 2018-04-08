@@ -170,6 +170,184 @@ ga('send', 'pageview');
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-effective-java-forloop-is-better" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/07/04/effective-java-forloop-is-better/">Effective Java 摘要: 46 for loop</a>
+    </h1>
+  
+
+        
+        <a href="/2016/07/04/effective-java-forloop-is-better/" class="archive-article-date">
+  	<time datetime="2016-07-04T01:53:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-07-04</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1.使用Iterator遍历时，<code>for</code>循环优于<code>while</code>循环。例如：</p>
+<pre><code>for(Iterator i = list.iterator(); i.hasnext();)    // use for-loop
+
+Iterator i = list.iterator();        // use while-loop
+while (i.hasnext()){ //balabala}
+</code></pre><p>为什么呢？首先，<code>for</code>循环更简介。其次，使用的<code>iterator</code>变量<code>i</code>为临时变量。这意味着什么？意味着避免了粘帖复制带来潜在的Bug。不信？请找出如下Bug：</p>
+<pre><code>Iterator i = list1.iterator();        
+   while (i.hasnext()){ 
+ //balabala
+}
+
+// copy-and-paste is my favorate...    
+Iterator i2 = list12.iterator();        
+   while (i.hasnext()){ 
+ //balabala
+}
+</code></pre><p>2.关于<code>for</code>循环，<code>foreach</code>比传统的<code>for</code>循环要好。例如：</p>
+<pre><code>for(Element e : list)    // better
+
+for(int i = 0; i &lt; list.length; i ++) // traditional idiom
+</code></pre><p>原因是<code>foreach</code>避免了可能出错的下标遍历方式，其次更简明直观，直达循环的语义（就是要对每个元素遍历，而不是关心具体的下标运算）。 </p>
+<p>另附一个Bug，来自<strong>Item 49: Prefer primitive types to boxed primitives</strong>，各位可以找一找。</p>
+<pre><code>Comperator&lt;Integer&gt; order = new Compartor&lt;Integer&gt;() {
+  public int compare(Integer first, Integer second){
+      return first &lt; second ? -1 : first == second ? 0 : 1;
+  }
+}
+</code></pre>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/07/04/effective-java-forloop-is-better/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-crontab-not-working-for-password" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/06/30/crontab-not-working-for-password/">linux crontab没有权限运行</a>
+    </h1>
+  
+
+        
+        <a href="/2016/06/30/crontab-not-working-for-password/" class="archive-article-date">
+  	<time datetime="2016-06-30T05:43:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-06-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>昨天公司的若干台Linux服务器，居然crontab中的定时任务没有被执行，后果比较严重。</p>
+<p>上到机器上，查看<code>$ crontab -l</code>，发现以下提示：</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Authentication token <span class="keyword">is</span> no longer valid; <span class="keyword">new</span> one required</span><br><span class="line"></span><br><span class="line">You (deploy) are <span class="keyword">not</span> allowed <span class="keyword">to</span> <span class="keyword">access</span> <span class="keyword">to</span> (crontab) because <span class="keyword">of</span> pam <span class="keyword">configuration</span>.</span><br></pre></td></tr></table></figure>
+<p>大意是说密码过期。（查看密码相关信息可用<code>chage -l deploy</code>）</p>
+<p>所以，以<code>sudo</code>更新deploy用户的密码即可。如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo passwd deploy</span></span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">crontab</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/DevOps//" class="article-tag-list-link color2">DevOps</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/06/30/crontab-not-working-for-password/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-TR-be-a-successful-programmer" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -881,275 +1059,6 @@ int mid = (right - left)/2 + left；
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2016/05/18/linux-chinese-character/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-job_summary_2016" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/16/job_summary_2016/">我司工作小结</a>
-    </h1>
-  
-
-        
-        <a href="/2016/05/16/job_summary_2016/" class="archive-article-date">
-  	<time datetime="2016-05-16T09:59:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-05-16</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="负责-参与的项目说明"><a href="#负责-参与的项目说明" class="headerlink" title="负责/参与的项目说明"></a>负责/参与的项目说明</h4><p>具体项目说明<strong><a href="http://akaala.github.io/2016/06/11/clog-intro/" target="_blank" rel="noopener">在此</a></strong>，简述就是基于大数据做的日志整合方案、与多维度数据统计整合方案。</p>
-<p>具体相关技术包括：</p>
-<ul>
-<li>Java, Java Profilling</li>
-<li>HBase, HDFS, Storm, Kafka, MySql</li>
-<li>Jersey, Spring MVC </li>
-<li>Srping Boot, Spring Cloud Config</li>
-<li>Javascript, Bootstrap, AngularJS</li>
-<li>Git, Gitlab, Github workflow</li>
-<li>Jenkins, Tomcat, Linux</li>
-<li>Elasticsearch, Kibana</li>
-<li>etc…</li>
-</ul>
-<p>列了这么多，确实是这个项目都需要的技术栈。从前端到后端，从传统的MySql到大数据存储与设计，从消息队列到实时计算，从代码风格到程序性能调优，从开发到自主运维与监控，除了项目的自主权不在自己，其他每个要点都需要关心。</p>
-<p>也不敢吹牛说是全栈工程师，毕竟只有两个人的团队（曾经是9人的团队），至少干的活是一人顶多人了。终究精力有限，除去每日支持工作和偶尔的运维工作（虽然机器偶尔会出问题的情况不多，还是需要人力去具体排查原因），再想要做更多事情，就有心无力的状态了。</p>
-<h4 id="其中特别的成果"><a href="#其中特别的成果" class="headerlink" title="其中特别的成果"></a>其中特别的成果</h4><ul>
-<li>使用Jenkins搭建持续交付平台，从纯手工发布到使用Jenkins发布到各环境。(各应用的适配，启动脚本，各机器环境统一化，Jenkins配置等)</li>
-<li>大数据相关应用接入Kerberos认证（其中的辛酸一言难尽）</li>
-<li>将原生Java应用引入Spring框架，转为Spring Boot应用。</li>
-<li>引入Spring Cloud Config，搭建基于Git的中央化的配置中心。</li>
-<li>基于<a href="https://github.com/codecentric/spring-boot-admin" target="_blank" rel="noopener">Spring-Cloud-Admin-Server</a>，搭建Spring项目的治理中心。</li>
-<li>搭建过EKL(Elasticsearch, Kibana, Logstash)，研究从HBase迁移到Elasticsearch方案的可行性。</li>
-<li>使用FreeMarker编写图文并茂的邮件。</li>
-</ul>
-<h4 id="目前的日常工作"><a href="#目前的日常工作" class="headerlink" title="目前的日常工作"></a>目前的日常工作</h4><p>业务扩容，应用运维，功能点升级，埋点监控等 （截至2016年中）</p>
-<h5 id="更具体的是："><a href="#更具体的是：" class="headerlink" title="更具体的是："></a>更具体的是：</h5><ul>
-<li>Java Agent升级改造（包括新增内部埋点，兼容CAT逻辑，修复历史Bug，短连接改长连接等）</li>
-<li>主业务各应用埋点，修复Bug，限流等</li>
-<li>接入我司新发布系统：有原自建的Jenkins平台切换到新的发布系统。</li>
-<li>升级我司数据接入层（类似MyBattis）</li>
-<li>应用各环境扩容，并发布: 管理四个部署环境，近百台机器，十多个应用。</li>
-<li>各种应用异常、挂掉的处理与恢复</li>
-<li>答复、解决各种邮件、lync咨询</li>
-</ul>
-<p>简而言之，<strong>“每天都是充实的一天”</strong>。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">resume</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/resume//" class="article-tag-list-link color2">resume</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/05/16/job_summary_2016/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-self_intro" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/16/self_intro/">自我介绍</a>
-    </h1>
-  
-
-        
-        <a href="/2016/05/16/self_intro/" class="archive-article-date">
-  	<time datetime="2016-05-16T09:46:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-05-16</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="Skills"><a href="#Skills" class="headerlink" title="Skills"></a>Skills</h4><ul>
-<li><strong>Java</strong>:    <ul>
-<li>“Thinking in Java”，掌握</li>
-<li>“Effective Java”，实践中</li>
-<li>“Clean Code”，可读性的代码风格</li>
-<li>“重构-改善既有代码的设计”，Code-&gt;Refactor的持续循环    </li>
-</ul>
-</li>
-<li><strong>Java Profiling</strong>: 可分析，会调优</li>
-<li><strong>Angular JS</strong>: 可以看、可以用的前端</li>
-<li><strong>Mysql</strong>:    CRUD，索引优化、查询优化</li>
-<li><strong>Git</strong>:    玩转Git，掌握Github workflow</li>
-<li><strong>Maven</strong>: 解决过各种疑难问题</li>
-<li><strong>Vim</strong>:    纯Vim环境熟练使用</li>
-<li><strong>Linux</strong>:    CentOS使用，运维</li>
-<li><strong>IntelliJ Idea</strong>：玩转</li>
-<li><strong>翻墙</strong>:  熟练使用翻墙工具与Stackoverflow。</li>
-</ul>
-<h4 id="使用过的主要组件"><a href="#使用过的主要组件" class="headerlink" title="使用过的主要组件"></a>使用过的主要组件</h4><ul>
-<li><strong>Spring Freamework</strong>: 用过，掌握基本原理</li>
-<li><strong>Spring Cloud Config</strong>: 研究过源码，提过PR</li>
-<li><strong>Hbase</strong>：    用过，Schema设计等</li>
-<li><strong>ElasticSearch</strong>: 用过，看过源码</li>
-<li><strong>Kafka</strong>:    用过，掌握基本原理</li>
-<li><strong>Storm</strong>:    用过，掌握基本原理</li>
-<li><strong>Kibana</strong>: 用过</li>
-</ul>
-<h4 id="参与过的项目"><a href="#参与过的项目" class="headerlink" title="参与过的项目"></a>参与过的项目</h4><p>目前主要参与2个项目，具体项目介绍在此（<strong><a href="http://akaala.github.io/2016/06/11/clog-intro/" target="_blank" rel="noopener">在此</a></strong>）。大致上就是基于大数据做的日志整合方案、与多维度数据统计整合方案。在项目中工作与负责内容包括但不限于：</p>
-<ul>
-<li>在一个2人团队中，负责原9人团队的项目工作（人员动荡与缩编），包括以下应用等：<ul>
-<li>Client （Java, .Net ，基于Thrift协议的Client)</li>
-<li>传输队列（非开源实现）</li>
-<li>实时计算（基于Storm）</li>
-<li>大数据存储（HBase/HDFS）</li>
-<li>前端展示（Bootstrap+AngularJS）</li>
-<li>Restful API（Spring MVC/Jersey）</li>
-<li>管理监控（Srping Boot Framework)</li>
-</ul>
-</li>
-<li>该项目每日数据量数十T，条目数百亿条，服务于开发人员与运维人员，每日独立用户数百人，访问次数：数万次（用户访问）/百万次（机器调用）。</li>
-<li>持续的扩容：机器增加近50%，HBase Schema优化，写入性能提高一倍，查询效率显著优化。贡献近半Commit数。</li>
-<li>新功能需求开发、测试。约每周1个新需求，来自用户需求、限流、逻辑优化、功能点新增，监控埋点等。</li>
-<li>负责多个测试环境与生产环境的应用部署、上线、维护。机器上百台，由手工维护模式改造成持续交付模式。</li>
-<li>日常运维、支持，解决用户的使用、困惑、异常等，锻炼语言交流、邮件协作、耐心等团队协作能力。会占用较多白天工作精力。</li>
-<li>接入、整合、升级公司其他组件、规范等。接入发布系统、消息中间件、数据库访问服务、公司监控系统等。</li>
-</ul>
-<h4 id="独当一面的能力"><a href="#独当一面的能力" class="headerlink" title="独当一面的能力"></a>独当一面的能力</h4><p>根据对技术人员的能力评估，以下是自己评价：</p>
-<ol>
-<li><p>项目方面</p>
-</li>
-<li><p>架构设计方面</p>
-</li>
-<li><p>人际能力</p>
-</li>
-<li><p>输出与分享</p>
-</li>
-</ol>
-<h4 id="理想中的团队"><a href="#理想中的团队" class="headerlink" title="理想中的团队"></a>理想中的团队</h4><ul>
-<li>敏捷团队，任务与目标驱动。</li>
-<li>职责清晰，团结协作。</li>
-<li>避免加班，家庭为重。</li>
-<li>默认提供已翻墙的网络</li>
-</ul>
-<h4 id="联系方式"><a href="#联系方式" class="headerlink" title="联系方式"></a>联系方式</h4><p>Email: jacobke2012”at”gmail.com</p>
-<h4 id="One-More-Thing"><a href="#One-More-Thing" class="headerlink" title="One More Thing"></a>One More Thing</h4><p>我的风格是“闭麦听歌1V9”（来自Dota2大神<a href="http://wiki.teamliquid.net/dota2/Miracle-" target="_blank" rel="noopener">Miracle</a>），写代码时必须保持专注。</p>
-<p>而其他时间，可以不停的找我，可以任何问题。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">resume</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/resume//" class="article-tag-list-link color2">resume</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/05/16/self_intro/">展开全文 >></a>
         </p>
       
 

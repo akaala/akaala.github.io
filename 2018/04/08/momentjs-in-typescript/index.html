@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://jacob.github.io">
-  <title>我回来啦 | Jacobs Blog</title>
+  <title>修复momentjs在Typescript项目中与Jest不能同时工作的问题 | Jacobs Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="半年没更新了。期间写了一些草稿，但也疏于整理了。  自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。 通过yilla主题配置Disqus更新了最新的yilla版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus">
+  <meta name="description" content="momentjs是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。 由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：import moment = require(&amp;quot;moment”);或import * as moment from &amp;#39;moment’;初期项目编译正常，运行正常。 而后我为了提高代码质量，引入了Jes">
 <meta property="og:type" content="article">
-<meta property="og:title" content="我回来啦">
-<meta property="og:url" content="http://jacob.github.io/2018/03/21/i-am-back/index.html">
+<meta property="og:title" content="修复momentjs在Typescript项目中与Jest不能同时工作的问题">
+<meta property="og:url" content="http://jacob.github.io/2018/04/08/momentjs-in-typescript/index.html">
 <meta property="og:site_name" content="Jacobs Blog">
-<meta property="og:description" content="半年没更新了。期间写了一些草稿，但也疏于整理了。  自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。 通过yilla主题配置Disqus更新了最新的yilla版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus">
+<meta property="og:description" content="momentjs是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。 由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：import moment = require(&amp;quot;moment”);或import * as moment from &amp;#39;moment’;初期项目编译正常，运行正常。 而后我为了提高代码质量，引入了Jes">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-20T17:01:13.964Z">
+<meta property="og:updated_time" content="2018-04-08T15:46:04.142Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="我回来啦">
-<meta name="twitter:description" content="半年没更新了。期间写了一些草稿，但也疏于整理了。  自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。 通过yilla主题配置Disqus更新了最新的yilla版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus">
+<meta name="twitter:title" content="修复momentjs在Typescript项目中与Jest不能同时工作的问题">
+<meta name="twitter:description" content="momentjs是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。 由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：import moment = require(&amp;quot;moment”);或import * as moment from &amp;#39;moment’;初期项目编译正常，运行正常。 而后我为了提高代码质量，引入了Jes">
   
     <link rel="alternative" href="/atom.xml" title="Jacobs Blog" type="application/atom+xml">
   
@@ -169,40 +169,54 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-i-am-back" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-momentjs-in-typescript" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      我回来啦
+      修复momentjs在Typescript项目中与Jest不能同时工作的问题
     </h1>
   
 
         
-        <a href="/2018/03/21/i-am-back/" class="archive-article-date">
-  	<time datetime="2018-03-20T16:44:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-21</time>
+        <a href="/2018/04/08/momentjs-in-typescript/" class="archive-article-date">
+  	<time datetime="2018-04-08T14:23:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-08</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <blockquote>
-<p>半年没更新了。期间写了一些草稿，但也疏于整理了。</p>
-</blockquote>
-<p>自从去年年中，“多说”关停之后，评论一直挂着。今天终于下决心，搞定评论的问题，也顺便更新下主题，修复其他问题等。</p>
-<h4 id="通过yilla主题配置Disqus"><a href="#通过yilla主题配置Disqus" class="headerlink" title="通过yilla主题配置Disqus"></a>通过yilla主题配置Disqus</h4><p>更新了最新的<a href="https://github.com/litten/hexo-theme-yilia" target="_blank" rel="noopener">yilla</a>版本，可以配置多种评论系统，如“畅言”，“网易云跟帖”，“Disqus”等。“畅言”需网站备案，“网易云跟帖”功能尚弱，“Disqus”需翻墙才可正常使用。还是选用Disqus，万一国内的提供商又挂了呢。</p>
-<p>在Disqus上操作流程倒简单，新建了website之后，在profile中找到’short name’，配置到yilla的config文件即可。如：</p>
-<pre><code>#4、Disqus 在hexo根目录的config里也有disqus_shortname字段，优先使用yilia的
-disqus: your_website_short_name
-</code></pre><h4 id="yilla主题更多功能"><a href="#yilla主题更多功能" class="headerlink" title="yilla主题更多功能"></a>yilla主题更多功能</h4><p>yilla主题新支持了打赏功能，虽然基本不可能有人真的肯花真金白银，还是做上。（我之前调研过：在简书这样的平台通过写文章打赏营收的方式是否可行，结果是打赏的次数微乎其微）</p>
-<p>截取了支付宝和微信的二维码，放置到<code>/img</code>目录下，把yilla的config中配置上即可。如：</p>
-<pre><code>alipay: /img/alipay_qr_code.png
-weixin: /img/weixin_pay_qr_code.png
-</code></pre><h4 id="I’m-back"><a href="#I’m-back" class="headerlink" title="I’m back"></a>I’m back</h4><p>这次更新主题后，整体页面更美观，字体和谐。感谢yilla作者。</p>
-<p>之后会根据在工作中各种收获，及之前累计的草稿，逐步发出来，供更多人参阅，也为技术分享做点贡献。</p>
+        <p><a href="https://momentjs.com/" target="_blank" rel="noopener">momentjs</a>是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。</p>
+<p>由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：<code>import moment = require(&quot;moment”);</code><br>或<code>import * as moment from &#39;moment’;</code>初期项目编译正常，运行正常。</p>
+<p>而后我为了提高代码质量，引入了<a href="https://facebook.github.io/jest/" target="_blank" rel="noopener">Jest</a>做自动化测试，然后就跪了。</p>
+<p>项目中一般是用<code>import * as moment from &#39;moment’</code>，那么Jest会报：</p>
+<pre><code>moment is not a function
+</code></pre><p>而后，若将引用改成：</p>
+<pre><code>import moment from &apos;moment’;
+</code></pre><p>则Jest运行test正常，但是项目运行就会报：</p>
+<pre><code>moment_1.default is not a function
+</code></pre><p>总之就是，项目运行和Jest运行测试不能两全，特别难搞。</p>
+<p>一番折腾之后，所幸在Github上搜到一个类似的案例:<br><a href="https://github.com/aurelia/skeleton-navigation/issues/606" target="_blank" rel="noopener">Importing moment in the TypeScript skeleton either breaks the app or the unit tests</a>，和我的困境一模一样。</p>
+<p>其中讲到其中至少两个解法：</p>
+<p>方法一：将moment的引用改成：</p>
+<pre><code>import * as moment from &quot;moment&quot;;
+if ((moment as any).default) {
+    (moment as any) = (moment as any).default;
+}
+</code></pre><p>项目与Jest都能正常工作。只是代码丑陋，<em>Tslint</em>通不过。</p>
+<p>方法二：使用<code>moment-es6</code>，而不是<code>moment</code>包。</p>
+<p>import moment from “moment-es6”;</p>
+<p>该方法最为简单，改动最小。</p>
+<p>再查看这个带es6的模块实现，就一个文件：</p>
+<pre><code>declare module &quot;moment-es6&quot; {
+  import * as moment from &quot;moment&quot;;
+  export default moment;
+}
+</code></pre><p>原来如此。</p>
+<p>导致<code>moment</code>在运行时和测试时不能正常工作的原因，是<code>moment</code>项目对Typescript的支持不好，欠缺Type Definitions，其官方在着手补全，但工程量很大且不是高优先级的事项，官方进度缓慢。各位若有碰到类似问题，采用方法二解决即可。</p>
 
       
 
@@ -292,7 +306,7 @@ weixin: /img/weixin_pay_qr_code.png
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://jacob.github.io/2018/03/21/i-am-back/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://jacob.github.io/2018/04/08/momentjs-in-typescript/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -306,18 +320,18 @@ weixin: /img/weixin_pay_qr_code.png
   
 <nav id="article-nav">
   
-    <a href="/2018/04/08/momentjs-in-typescript/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2018/04/08/spring-data-es-critical-pagable-bug/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          修复momentjs在Typescript项目中与Jest不能同时工作的问题
+          Spring Data Elasticsearch Page Slice 分页功能不能正确分页的bug
         
       </div>
     </a>
   
   
-    <a href="/2017/09/13/netty-recycler-cache/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">禁用Netty对象缓存机制</div>
+    <a href="/2018/03/21/i-am-back/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">我回来啦</div>
       <i class="icon-circle-right"></i>
     </a>
   

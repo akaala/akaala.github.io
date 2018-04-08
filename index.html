@@ -170,6 +170,190 @@ ga('send', 'pageview');
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-spring-data-es-critical-pagable-bug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/08/spring-data-es-critical-pagable-bug/">Spring Data Elasticsearch Page Slice 分页功能不能正确分页的bug</a>
+    </h1>
+  
+
+        
+        <a href="/2018/04/08/spring-data-es-critical-pagable-bug/" class="archive-article-date">
+  	<time datetime="2018-04-08T14:39:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-08</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>最近在做一个基于Elasticsearch的项目，发现<code>spring-data-elasticsearch</code>组件提供的CRUD功能特别好用。但是使用中发现分页的功能，即<code>spring-data</code>提供的<code>Pagalbe</code>, <code>Slice</code>功能实际不能正确分页的bug。且该Bug影响了目前spring-data-elasticsearch的3.0~3.0.3版本，至今未修复。</p>
+</blockquote>
+<h4 id="好用的spring-data-elasticsearch与分页功能"><a href="#好用的spring-data-elasticsearch与分页功能" class="headerlink" title="好用的spring-data-elasticsearch与分页功能"></a>好用的<code>spring-data-elasticsearch</code>与分页功能</h4><p><code>spring-data-elasticsearch</code>提供了各种基于<code>CrudRepository</code>的便利<strong>CRUD</strong>操作后，可以自动将基本的查询检索操作翻译成Elasticsearch的<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html" target="_blank" rel="noopener">Query DSL</a>。只要按照简单易学的<code>spring-data</code>的schema编写Repository的接口名，就可像使用Mybatis一样使用elasticsearch。</p>
+<p>特别的，只要在interface中带上<code>Pageable</code>的输入参数，就能<strong>自动实现分页</strong>的效果(<a href="https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#repositories.special-parameters" target="_blank" rel="noopener">spring doc</a>)。例如：</p>
+<pre><code>Page&lt;Article&gt; articleByAuthorName
+  = articleService.findByAuthorName(nameToFind, PageRequest.of(0, 10));
+
+Slice&lt;Article&gt; articleByAuthorNameAsSlice
+  = articleService.findByAuthorNameAsSlice(nameToFind, PageRequest.of(0, 10));
+</code></pre><p>其中返回参数<code>Page</code>和<code>Slice</code>的区别是：<code>Page</code>对象会计算结果集的totalCount，在数据量大时会有一定的计算代价；而<code>Slice</code>不会计算总结果数量，只知道是否<code>hasNext()</code>。</p>
+<p>类似的，用<code>Slice</code>做大结果集的遍历，也非常简单。可用自带的<code>nextPagable</code>计算下一页的偏移量。</p>
+<pre><code>while (slice.hasNext()) {
+        slice = eventRepository.findByAppId(appId, slice.nextPageable());
+        result.addAll(slice.getContent());
+    }
+</code></pre><h4 id="惨遇分页bug"><a href="#惨遇分页bug" class="headerlink" title="惨遇分页bug"></a>惨遇分页bug</h4><p>但是！这么方便的功能，在目前版本中是不能正常运作的！</p>
+<p>现在是2018年4月，在<a href="https://projects.spring.io/spring-data-elasticsearch/" target="_blank" rel="noopener">Spring project</a>主页上的版本从<strong>3.0.6</strong>到<strong>3.1.0 M1</strong>都有这个Bug的！</p>
+<p>在spring的jira上<a href="https://jira.spring.io/browse/DATAES-396" target="_blank" rel="noopener">DATAES-396</a>，<a href="https://jira.spring.io/browse/DATAES-402" target="_blank" rel="noopener">DATAES-402</a>就是反映这个这个<strong>Blocker</strong>级别的bug。从2017年9月份发布3.0依赖就有这个bug了，相关热心开发者也提供了<a href="https://github.com/spring-projects/spring-data-elasticsearch/pull/198/files" target="_blank" rel="noopener">PR</a>，但是直到最近（约2018年3月）才被merge进master分支！</p>
+<p>其实导致这个错误的代码就一行，在<code>FacetedPageImpl</code>的构造函数中，将Pageable写死成了<code>Pageable.unpaged()</code>:</p>
+<pre><code>public FacetedPageImpl(List&lt;T&gt; content, Pageable pageable, long total) {
+    super(content, Pageable.unpaged(), total);
+ }
+</code></pre><p>改起来也很简单：</p>
+<pre><code>public FacetedPageImpl(List&lt;T&gt; content, Pageable pageable, long total) {
+        super(content, ofNullable(pageable).orElse(Pageable.unpaged()), total);
+    }
+</code></pre><h4 id="为什么响应这么慢？"><a href="#为什么响应这么慢？" class="headerlink" title="为什么响应这么慢？"></a>为什么响应这么慢？</h4><p>在搜索这个问题过程中，有人在stackoverflow上反应，不仅这种重要的bug未能及时修复，还抱怨<code>spring-data-elasticsearch</code>未能更上elstic的开发脚步（spring data es目前支持到了Elasticsearch 5, 而elstico现在已推出了6.3版本，提供了rollup，shrink等api)。</p>
+<p>下面有人附和到，他去参加了spring的一个相关会议，spring的总架构师，把<code>spring-data-elasticsearch</code>划分到了<em>community project</em>。也就是说，剩下的维护大多靠社区的PR，官方不会那么及时的跟进elastic的步伐。一句话总结就是：没娘的项目惨兮兮。</p>
+<p>（那个讨论贴，忘了记录下来，现在找不到了地址了）</p>
+<p>经历了这次事件后，再也不迷信<code>Spring</code>的项目就是高质量的项目。对于开源软件框架等，存一份质疑之心。知其然，也要知其所以然。</p>
+<p>最后，期望<code>spring-data-elasticsearch</code>尽快发布3.1 release版本。查看<a href="https://spring-calendar.cfapps.io/" target="_blank" rel="noopener">Spring calendar</a>，好像近期都没有计划。 ::cry::</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/04/08/spring-data-es-critical-pagable-bug/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-momentjs-in-typescript" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/08/momentjs-in-typescript/">修复momentjs在Typescript项目中与Jest不能同时工作的问题</a>
+    </h1>
+  
+
+        
+        <a href="/2018/04/08/momentjs-in-typescript/" class="archive-article-date">
+  	<time datetime="2018-04-08T14:23:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-08</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://momentjs.com/" target="_blank" rel="noopener">momentjs</a>是一个好用得不得了的时间组件库，我们最新的React项目中也引入了它。</p>
+<p>由于我们强制规定使用Typescript作为前端的编程语言，那么引入moment时的代码是：<code>import moment = require(&quot;moment”);</code><br>或<code>import * as moment from &#39;moment’;</code>初期项目编译正常，运行正常。</p>
+<p>而后我为了提高代码质量，引入了<a href="https://facebook.github.io/jest/" target="_blank" rel="noopener">Jest</a>做自动化测试，然后就跪了。</p>
+<p>项目中一般是用<code>import * as moment from &#39;moment’</code>，那么Jest会报：</p>
+<pre><code>moment is not a function
+</code></pre><p>而后，若将引用改成：</p>
+<pre><code>import moment from &apos;moment’;
+</code></pre><p>则Jest运行test正常，但是项目运行就会报：</p>
+<pre><code>moment_1.default is not a function
+</code></pre><p>总之就是，项目运行和Jest运行测试不能两全，特别难搞。</p>
+<p>一番折腾之后，所幸在Github上搜到一个类似的案例:<br><a href="https://github.com/aurelia/skeleton-navigation/issues/606" target="_blank" rel="noopener">Importing moment in the TypeScript skeleton either breaks the app or the unit tests</a>，和我的困境一模一样。</p>
+<p>其中讲到其中至少两个解法：</p>
+<p>方法一：将moment的引用改成：</p>
+<pre><code>import * as moment from &quot;moment&quot;;
+if ((moment as any).default) {
+    (moment as any) = (moment as any).default;
+}
+</code></pre><p>项目与Jest都能正常工作。只是代码丑陋，<em>Tslint</em>通不过。</p>
+<p>方法二：使用<code>moment-es6</code>，而不是<code>moment</code>包。</p>
+<p>import moment from “moment-es6”;</p>
+<p>该方法最为简单，改动最小。</p>
+<p>再查看这个带es6的模块实现，就一个文件：</p>
+<pre><code>declare module &quot;moment-es6&quot; {
+  import * as moment from &quot;moment&quot;;
+  export default moment;
+}
+</code></pre><p>原来如此。</p>
+<p>导致<code>moment</code>在运行时和测试时不能正常工作的原因，是<code>moment</code>项目对Typescript的支持不好，欠缺Type Definitions，其官方在着手补全，但工程量很大且不是高优先级的事项，官方进度缓慢。各位若有碰到类似问题，采用方法二解决即可。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/04/08/momentjs-in-typescript/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-i-am-back" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -914,191 +1098,6 @@ audioElement.play();
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/01/20/Linux下配置ssh无密码登录/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-fck-snapshot" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/12/15/fck-snapshot/">Maven SNAPSHOT的教训</a>
-    </h1>
-  
-
-        
-        <a href="/2016/12/15/fck-snapshot/" class="archive-article-date">
-  	<time datetime="2016-12-15T05:32:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-12-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="一次怪异的生产事故"><a href="#一次怪异的生产事故" class="headerlink" title="一次怪异的生产事故"></a>一次怪异的生产事故</h1><h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>前几天，我对代码略作修改后，从测试环境最终到生产环境发布了某个组件。（我们这里实行快速迭代，因此每周都有发布。）</p>
-<p>灰度发布时，该组件业务逻辑运行正常，却突然发现我司APM产品的埋点都没有了。<br>埋点看不到，相当于该应用各种指标监控都没了，应用不受控制了，是个大事件。</p>
-<p>短暂排查（如检查配置等）了之后仍未解决，立刻回滚到上一次版本（简称为<code>release_old</code>)。<br>果然，<code>release_old</code>版本的APM产品埋点正常。</p>
-<p>结论很明显：<strong>肯定是我提交的代码出了问题</strong>。</p>
-<h2 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h2><p>反复review代码后，实在思考不出问题之所在。因为相关代码与和APM Agent的配置没有任何变动。</p>
-<p>这个时候心里是挺慌的：回滚能够解决一时的问题，不找到根本原因，以后发布都可能出这种问题。</p>
-<p>仔细一想，我这边变化不大，有不有可能是APM那边的有变更呢？</p>
-<p>因此，仍旧使用<code>release_old</code>版本的代码，但是<strong>重新</strong>编译，发布。<br>（我们的发布系统回滚是直接使用旧的发布包）</p>
-<p>最终，<strong>同样</strong>没有APM埋点。</p>
-<p>这是终于知道：确实是外部依赖APM Agent变更导致的问题。</p>
-<h2 id="Root-Cause"><a href="#Root-Cause" class="headerlink" title="Root Cause"></a>Root Cause</h2><p>问题还没结束，继续排查代码依赖的Jar，比较灰度发布不正常的机器和正常的机器，有如下发现：</p>
-<p><img src="http://jacobke.github.io/img/post/fck_snapshot/diff_mosaiced.png" alt=""></p>
-<p>发现主要的异同就是这个<code>xxx-common-1.0.7-20161212.094128-2.jar</code>与<code>xxx-common-1.0.7-20161128.040513-1.jar</code>。<br>前者是最新的编译打包结果，后者是埋点正常的打包结果。</p>
-<p>是不是它呢？采样替换法，将<code>20161212</code>替换成<code>20161128</code>的版本，重新启动应用。<strong>Agent埋点正常</strong>。</p>
-<p>最终结论，问题就出在这个<code>xxx-common-1.0.7-20161212.094128-2.jar</code>中——<code>xxx-common</code>组件的SNAPSHOT的版本。</p>
-<p>真正的原因是：我的项目的maven依赖中使用的是<code>xxx-common</code>的<code>1.0.7-SNAPSHOT</code>，而我发布时正好将它一个有问题的SNAPSHOT版本带上去了（刚deploy上去，还未测试）。最终联系该组件Owner，待bug修复，使用最新的稳定版，发布。一切正常！</p>
-<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>最终找到问题大约花了两个小时，自我感觉算快的。</p>
-<p>解决这个问题的难点在于不仅要对自己项目的深刻了解，还要了解项目的外部依赖（或依赖的外部服务）。</p>
-<p>而这个小事故的本质原因就是项目使用了<strong>SNAPSHOT版本</strong>的组件。</p>
-<p>所谓<strong>SNAPSHOT</strong>，即是应用开发过程中的<strong>不稳定版本</strong>。有时我们图方便，懒得频繁去更新版本，就把依赖写成SNAPSHOT。而就是这个懒惰，某些bug会随着它偷偷的进入你的项目，会让以后花更多时间去还债。</p>
-<p>在开发时，我们使用<strong>SNAPSHOT</strong>版本无可厚非，加快开发速度和减少沟通成本。但是发布到生产的应用时，应杜绝使用不稳定的<strong>SNAPSHOT</strong>版本，才尽可能避免外部因素影响到你的项目。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/12/15/fck-snapshot/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-git-practice" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/11/29/git-practice/">git_practice</a>
-    </h1>
-  
-
-        
-        <a href="/2016/11/29/git-practice/" class="archive-article-date">
-  	<time datetime="2016-11-29T11:20:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-11-29</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="Git-Practise"><a href="#Git-Practise" class="headerlink" title="Git Practise"></a>Git Practise</h1><ul>
-<li><p>Branchs:</p>
-<ol>
-<li><code>master</code> branch is protected, <code>master</code> should be always deployable!</li>
-<li><code>alpha_release</code> branch could be auto deployed to Alpha Environment, and it is NOT proctected. It is regard as our CI/CD branch.</li>
-<li>developer could create new branch like <code>feature_add_button</code>, <code>dev_optimize_performance</code> etc.</li>
-</ol>
-</li>
-<li><p>Developer and Deploy</p>
-<ol>
-<li>One developer does coding on his local feature. (Or, he could push his feature branch to remote to share the development with others.)</li>
-<li>If developer want to release to Alpha Environment, <strong>just</strong> merge his branch to <code>alpha_release</code></li>
-<li>If project owner wants to release to Prod Environment, he should merge <code>alpha_release</code> to <code>master</code> or <em>cherry-pick</em> dev-branches to <code>master</code>.<br>Then, always only deploy <code>master</code> to Pord. (and add a tag to <code>master</code> is also helpful).</li>
-</ol>
-</li>
-<li><p>In a All</p>
-<ol>
-<li>When seperate developers coding on different projects (those may have dependencies), they could communicate with <code>alpha_release</code>:<ul>
-<li>Before:<ul>
-<li>A: Hey, dude, my excellent job’s done! Check them!</li>
-<li>B: ‘mkay, you are on which branch?</li>
-<li>A: Oh, my branch is “my_excellent_work_1”. Pull and try it.</li>
-<li>B: ‘mkay. (pull and checkout, run A’app.) Oops, there is some Exception..</li>
-<li>A: Woo, that maybe, some environment issue, try this and that…</li>
-<li>B: …</li>
-</ul>
-</li>
-<li>Now:<ul>
-<li>A: Hey, dude, my excellent job’s done! Check xxx(project module)’s new API, they are on Alpha now.</li>
-<li>B: Ok, wait a minutes. (Change config to Alpha Environment, reload the app). Hurray, that sucks!</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>When project owner deploy <code>master</code>, check the <code>alpha_release</code>‘s update carefully! (because, <code>alpha_release</code> may contain some unstable commit.<br>That’s also means CI on <code>alpha_release</code> and <code>master</code> is <strong>strongly</strong> recommanded!) </li>
-<li>Tip: don’t directly coding on <code>alpha_release</code>, use ‘checkout and merge’ mode.</li>
-<li>Tip: keep commit focus on one feature, try <code>git rebase -i</code>.</li>
-</ol>
-</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/11/29/git-practice/">展开全文 >></a>
         </p>
       
 

@@ -170,6 +170,191 @@ ga('send', 'pageview');
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-fck-snapshot" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/12/15/fck-snapshot/">Maven SNAPSHOT的教训</a>
+    </h1>
+  
+
+        
+        <a href="/2016/12/15/fck-snapshot/" class="archive-article-date">
+  	<time datetime="2016-12-15T05:32:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="一次怪异的生产事故"><a href="#一次怪异的生产事故" class="headerlink" title="一次怪异的生产事故"></a>一次怪异的生产事故</h1><h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>前几天，我对代码略作修改后，从测试环境最终到生产环境发布了某个组件。（我们这里实行快速迭代，因此每周都有发布。）</p>
+<p>灰度发布时，该组件业务逻辑运行正常，却突然发现我司APM产品的埋点都没有了。<br>埋点看不到，相当于该应用各种指标监控都没了，应用不受控制了，是个大事件。</p>
+<p>短暂排查（如检查配置等）了之后仍未解决，立刻回滚到上一次版本（简称为<code>release_old</code>)。<br>果然，<code>release_old</code>版本的APM产品埋点正常。</p>
+<p>结论很明显：<strong>肯定是我提交的代码出了问题</strong>。</p>
+<h2 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h2><p>反复review代码后，实在思考不出问题之所在。因为相关代码与和APM Agent的配置没有任何变动。</p>
+<p>这个时候心里是挺慌的：回滚能够解决一时的问题，不找到根本原因，以后发布都可能出这种问题。</p>
+<p>仔细一想，我这边变化不大，有不有可能是APM那边的有变更呢？</p>
+<p>因此，仍旧使用<code>release_old</code>版本的代码，但是<strong>重新</strong>编译，发布。<br>（我们的发布系统回滚是直接使用旧的发布包）</p>
+<p>最终，<strong>同样</strong>没有APM埋点。</p>
+<p>这是终于知道：确实是外部依赖APM Agent变更导致的问题。</p>
+<h2 id="Root-Cause"><a href="#Root-Cause" class="headerlink" title="Root Cause"></a>Root Cause</h2><p>问题还没结束，继续排查代码依赖的Jar，比较灰度发布不正常的机器和正常的机器，有如下发现：</p>
+<p><img src="http://jacobke.github.io/img/post/fck_snapshot/diff_mosaiced.png" alt=""></p>
+<p>发现主要的异同就是这个<code>xxx-common-1.0.7-20161212.094128-2.jar</code>与<code>xxx-common-1.0.7-20161128.040513-1.jar</code>。<br>前者是最新的编译打包结果，后者是埋点正常的打包结果。</p>
+<p>是不是它呢？采样替换法，将<code>20161212</code>替换成<code>20161128</code>的版本，重新启动应用。<strong>Agent埋点正常</strong>。</p>
+<p>最终结论，问题就出在这个<code>xxx-common-1.0.7-20161212.094128-2.jar</code>中——<code>xxx-common</code>组件的SNAPSHOT的版本。</p>
+<p>真正的原因是：我的项目的maven依赖中使用的是<code>xxx-common</code>的<code>1.0.7-SNAPSHOT</code>，而我发布时正好将它一个有问题的SNAPSHOT版本带上去了（刚deploy上去，还未测试）。最终联系该组件Owner，待bug修复，使用最新的稳定版，发布。一切正常！</p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>最终找到问题大约花了两个小时，自我感觉算快的。</p>
+<p>解决这个问题的难点在于不仅要对自己项目的深刻了解，还要了解项目的外部依赖（或依赖的外部服务）。</p>
+<p>而这个小事故的本质原因就是项目使用了<strong>SNAPSHOT版本</strong>的组件。</p>
+<p>所谓<strong>SNAPSHOT</strong>，即是应用开发过程中的<strong>不稳定版本</strong>。有时我们图方便，懒得频繁去更新版本，就把依赖写成SNAPSHOT。而就是这个懒惰，某些bug会随着它偷偷的进入你的项目，会让以后花更多时间去还债。</p>
+<p>在开发时，我们使用<strong>SNAPSHOT</strong>版本无可厚非，加快开发速度和减少沟通成本。但是发布到生产的应用时，应杜绝使用不稳定的<strong>SNAPSHOT</strong>版本，才尽可能避免外部因素影响到你的项目。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/12/15/fck-snapshot/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-git-practice" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/11/29/git-practice/">git_practice</a>
+    </h1>
+  
+
+        
+        <a href="/2016/11/29/git-practice/" class="archive-article-date">
+  	<time datetime="2016-11-29T11:20:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-11-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Git-Practise"><a href="#Git-Practise" class="headerlink" title="Git Practise"></a>Git Practise</h1><ul>
+<li><p>Branchs:</p>
+<ol>
+<li><code>master</code> branch is protected, <code>master</code> should be always deployable!</li>
+<li><code>alpha_release</code> branch could be auto deployed to Alpha Environment, and it is NOT proctected. It is regard as our CI/CD branch.</li>
+<li>developer could create new branch like <code>feature_add_button</code>, <code>dev_optimize_performance</code> etc.</li>
+</ol>
+</li>
+<li><p>Developer and Deploy</p>
+<ol>
+<li>One developer does coding on his local feature. (Or, he could push his feature branch to remote to share the development with others.)</li>
+<li>If developer want to release to Alpha Environment, <strong>just</strong> merge his branch to <code>alpha_release</code></li>
+<li>If project owner wants to release to Prod Environment, he should merge <code>alpha_release</code> to <code>master</code> or <em>cherry-pick</em> dev-branches to <code>master</code>.<br>Then, always only deploy <code>master</code> to Pord. (and add a tag to <code>master</code> is also helpful).</li>
+</ol>
+</li>
+<li><p>In a All</p>
+<ol>
+<li>When seperate developers coding on different projects (those may have dependencies), they could communicate with <code>alpha_release</code>:<ul>
+<li>Before:<ul>
+<li>A: Hey, dude, my excellent job’s done! Check them!</li>
+<li>B: ‘mkay, you are on which branch?</li>
+<li>A: Oh, my branch is “my_excellent_work_1”. Pull and try it.</li>
+<li>B: ‘mkay. (pull and checkout, run A’app.) Oops, there is some Exception..</li>
+<li>A: Woo, that maybe, some environment issue, try this and that…</li>
+<li>B: …</li>
+</ul>
+</li>
+<li>Now:<ul>
+<li>A: Hey, dude, my excellent job’s done! Check xxx(project module)’s new API, they are on Alpha now.</li>
+<li>B: Ok, wait a minutes. (Change config to Alpha Environment, reload the app). Hurray, that sucks!</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>When project owner deploy <code>master</code>, check the <code>alpha_release</code>‘s update carefully! (because, <code>alpha_release</code> may contain some unstable commit.<br>That’s also means CI on <code>alpha_release</code> and <code>master</code> is <strong>strongly</strong> recommanded!) </li>
+<li>Tip: don’t directly coding on <code>alpha_release</code>, use ‘checkout and merge’ mode.</li>
+<li>Tip: keep commit focus on one feature, try <code>git rebase -i</code>.</li>
+</ol>
+</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2016/11/29/git-practice/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-one-small-code-bug" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -836,184 +1021,6 @@ $ dd if=~/aliyun.img of=/dev/xvda
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2016/07/06/aliyun-server-backup-1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-effective-java-forloop-is-better" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/07/04/effective-java-forloop-is-better/">Effective Java 摘要: 46 for loop</a>
-    </h1>
-  
-
-        
-        <a href="/2016/07/04/effective-java-forloop-is-better/" class="archive-article-date">
-  	<time datetime="2016-07-04T01:53:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-07-04</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1.使用Iterator遍历时，<code>for</code>循环优于<code>while</code>循环。例如：</p>
-<pre><code>for(Iterator i = list.iterator(); i.hasnext();)    // use for-loop
-
-Iterator i = list.iterator();        // use while-loop
-while (i.hasnext()){ //balabala}
-</code></pre><p>为什么呢？首先，<code>for</code>循环更简介。其次，使用的<code>iterator</code>变量<code>i</code>为临时变量。这意味着什么？意味着避免了粘帖复制带来潜在的Bug。不信？请找出如下Bug：</p>
-<pre><code>Iterator i = list1.iterator();        
-   while (i.hasnext()){ 
- //balabala
-}
-
-// copy-and-paste is my favorate...    
-Iterator i2 = list12.iterator();        
-   while (i.hasnext()){ 
- //balabala
-}
-</code></pre><p>2.关于<code>for</code>循环，<code>foreach</code>比传统的<code>for</code>循环要好。例如：</p>
-<pre><code>for(Element e : list)    // better
-
-for(int i = 0; i &lt; list.length; i ++) // traditional idiom
-</code></pre><p>原因是<code>foreach</code>避免了可能出错的下标遍历方式，其次更简明直观，直达循环的语义（就是要对每个元素遍历，而不是关心具体的下标运算）。 </p>
-<p>另附一个Bug，来自<strong>Item 49: Prefer primitive types to boxed primitives</strong>，各位可以找一找。</p>
-<pre><code>Comperator&lt;Integer&gt; order = new Compartor&lt;Integer&gt;() {
-  public int compare(Integer first, Integer second){
-      return first &lt; second ? -1 : first == second ? 0 : 1;
-  }
-}
-</code></pre>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/07/04/effective-java-forloop-is-better/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-crontab-not-working-for-password" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/06/30/crontab-not-working-for-password/">linux crontab没有权限运行</a>
-    </h1>
-  
-
-        
-        <a href="/2016/06/30/crontab-not-working-for-password/" class="archive-article-date">
-  	<time datetime="2016-06-30T05:43:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-06-30</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>昨天公司的若干台Linux服务器，居然crontab中的定时任务没有被执行，后果比较严重。</p>
-<p>上到机器上，查看<code>$ crontab -l</code>，发现以下提示：</p>
-<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Authentication token <span class="keyword">is</span> no longer valid; <span class="keyword">new</span> one required</span><br><span class="line"></span><br><span class="line">You (deploy) are <span class="keyword">not</span> allowed <span class="keyword">to</span> <span class="keyword">access</span> <span class="keyword">to</span> (crontab) because <span class="keyword">of</span> pam <span class="keyword">configuration</span>.</span><br></pre></td></tr></table></figure>
-<p>大意是说密码过期。（查看密码相关信息可用<code>chage -l deploy</code>）</p>
-<p>所以，以<code>sudo</code>更新deploy用户的密码即可。如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo passwd deploy</span></span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">crontab</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/DevOps//" class="article-tag-list-link color2">DevOps</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/06/30/crontab-not-working-for-password/">展开全文 >></a>
         </p>
       
 
